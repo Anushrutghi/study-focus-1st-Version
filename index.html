@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>focus enviroment
+
+    </title>
+    <style>
+        :root {
+            --bg: #000;
+            --cyan: #00f2ff;
+            --dark: #0a0a0a;
+            --border: #1a1a1a;
+            --panel: #050505;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            height: 100vh; 
+            width: 100vw;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 600px; 
+            text-align: center; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 4px; opacity: 0.3; margin-bottom: 1rem; }
+        
+        #display {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: clamp(2.5rem, 15vw, 6rem);
+            color: var(--cyan);
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            margin-bottom: 2rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 2.5rem; width: 100%; }
+        
+        button.timer-btn {
+            background: var(--dark);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            flex: 1;
+            max-width: 100px;
+        }
+        
+        .active-btn { border-color: var(--cyan) !important; color: var(--cyan) !important; box-shadow: 0 0 10px rgba(0, 242, 255, 0.1); }
+
+        /* Responsive Mixer */
+        .mixer-panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 16px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        @media (max-width: 480px) {
+            .mixer-panel { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+            #display { margin-bottom: 1.5rem; }
+        }
+
+        .channel { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            opacity: 0.15;
+            filter: grayscale(1);
+            transition: transform 0.2s, opacity 0.3s;
+        }
+
+        .icon-btn.active { opacity: 1; filter: grayscale(0); transform: scale(1.1); }
+
+        .v-slider {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 4px;
+            height: 80px;
+            background: #1a1a1a;
+            outline: none;
+            border-radius: 2px;
+            writing-mode: bt-lr; 
+            -webkit-appearance: slider-vertical;
+        }
+
+        .v-slider::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--cyan);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .chan-label { font-size: 0.5rem; opacity: 0.3; text-transform: uppercase; letter-spacing: 1px; }
+
+        .hints { margin-top: 2rem; font-size: 0.5rem; opacity: 0.15; letter-spacing: 2px; }
+        [hidden] { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="label">focus enviroment</div>
+    <div id="display">00:00:00:00</div>
+
+    <div class="controls">
+        <button id="startBtn" class="timer-btn active-btn">Start</button>
+        <button id="pauseBtn" class="timer-btn" hidden>Pause</button>
+        <button id="resumeBtn" class="timer-btn" hidden>Resume</button>
+        <button id="resetBtn" class="timer-btn">Reset</button>
+    </div>
+
+    <div class="mixer-panel">
+        <div class="channel">
+            <button class="icon-btn" data-sound="thunder">⚡</button>
+            <input type="range" class="v-slider" id="vol-thunder" min="0" max="1" step="0.01" value="0.5">
+            <span class="chan-label">Storm</span>
+        </div>
+        <div class="channel">
+            <button class="icon-btn" data-sound="wind">🌬️</button>
+            <input type="range" class="v-slider" id="vol-wind" min="0" max="1" step="0.01" value="0.5">
+            <span class="chan-label">Wind</span>
+        </div>
+        <div class="channel">
+            <button class="icon-btn" data-sound="jungle">🌳</button>
+            <input type="range" class="v-slider" id="vol-jungle" min="0" max="1" step="0.01" value="0.5">
+            <span class="chan-label">Wild</span>
+        </div>
+        <div class="channel">
+            <button class="icon-btn" data-sound="peace">🧘</button>
+            <input type="range" class="v-slider" id="vol-peace" min="0" max="1" step="0.01" value="0.5">
+            <span class="chan-label">Zen</span>
+        </div>
+        <div class="channel">
+            <button class="icon-btn" data-sound="flow">🌊</button>
+            <input type="range" class="v-slider" id="vol-flow" min="0" max="1" step="0.01" value="0.5">
+            <span class="chan-label">Flow</span>
+        </div>
+    </div>
+
+    <div class="hints">DESKTOP: SPACE/S/R | MOBILE: TAP TO START</div>
+</div>
+
+<script>
+    let start, elapsed = 0, timer;
+    const disp = document.getElementById('display');
+    const b = { s: document.getElementById('startBtn'), p: document.getElementById('pauseBtn'), re: document.getElementById('resumeBtn'), rs: document.getElementById('resetBtn') };
+
+    function pad(n) { return n.toString().padStart(2, '0'); }
+    function update() {
+        let ms = Date.now() - start;
+        let h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000), s = Math.floor((ms % 60000) / 1000), c = Math.floor((ms % 1000) / 10);
+        disp.innerText = `${pad(h)}:${pad(m)}:${pad(s)}:${pad(c)}`;
+    }
+
+    const timerStart = () => { unlockAudio(); start = Date.now() - elapsed; timer = setInterval(update, 10); b.s.hidden=1; b.p.hidden=0; b.re.hidden=1; };
+    const timerPause = () => { clearInterval(timer); elapsed = Date.now() - start; b.p.hidden=1; b.re.hidden=0; };
+    const timerReset = () => { clearInterval(timer); elapsed = 0; disp.innerText = "00:00:00:00"; b.s.hidden=0; b.p.hidden=1; b.re.hidden=1; };
+
+    b.s.onclick = timerStart; b.p.onclick = timerPause; b.re.onclick = timerStart; b.rs.onclick = timerReset;
+
+    // --- CROSS-PLATFORM AUDIO ENGINE ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AudioContext();
+    const channels = {
+        thunder: { g: ctx.createGain(), active: false, loop: null },
+        wind: { g: ctx.createGain(), active: false, loop: null },
+        jungle: { g: ctx.createGain(), active: false, loop: null },
+        peace: { g: ctx.createGain(), active: false, loop: null },
+        flow: { g: ctx.createGain(), active: false, loop: null }
+    };
+
+    Object.keys(channels).forEach(k => { channels[k].g.connect(ctx.destination); channels[k].g.gain.value = 0.5; });
+
+    // iOS/Android Unlock
+    function unlockAudio() { if (ctx.state === 'suspended') ctx.resume(); }
+
+    function createNoise() {
+        const bufferSize = 2 * ctx.sampleRate, buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate), d = buffer.getChannelData(0);
+        let last = 0;
+        for (let i = 0; i < bufferSize; i++) {
+            let white = Math.random() * 2 - 1;
+            d[i] = (last + (0.02 * white)) / 1.02; last = d[i]; d[i] *= 3.5;
+        }
+        return buffer;
+    }
+
+    function playThunder() {
+        if (!channels.thunder.active) return;
+        const osc = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(45, ctx.currentTime);
+        f.type = 'lowpass'; f.frequency.value = 60;
+        g.gain.setValueAtTime(0, ctx.currentTime); g.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.5);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 8);
+        osc.connect(f); f.connect(g); g.connect(channels.thunder.g);
+        osc.start(); osc.stop(ctx.currentTime + 8);
+        setTimeout(playThunder, 15000 + Math.random() * 20000);
+    }
+
+    function playBirds() {
+        if (!channels.jungle.active) return;
+        const osc = ctx.createOscillator(), g = ctx.createGain();
+        osc.frequency.setValueAtTime(1200 + Math.random() * 600, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1800, ctx.currentTime + 0.1);
+        g.gain.setValueAtTime(0, ctx.currentTime); g.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.05);
+        g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+        osc.connect(g); g.connect(channels.jungle.g);
+        osc.start(); osc.stop(ctx.currentTime + 0.3);
+        setTimeout(playBirds, 6000 + Math.random() * 9000);
+    }
+
+    function toggle(name, btn) {
+        unlockAudio();
+        const c = channels[name];
+        if (c.active) {
+            if (c.loop) c.loop.stop(); if (c.nodes) c.nodes.forEach(n => n.stop());
+            c.active = false; btn.classList.remove('active');
+        } else {
+            c.active = true; btn.classList.add('active');
+            if (name === 'peace') {
+                const o1 = ctx.createOscillator(), o2 = ctx.createOscillator();
+                o1.frequency.value = 110; o2.frequency.value = 114;
+                o1.connect(c.g); o2.connect(c.g); o1.start(); o2.start();
+                c.nodes = [o1, o2];
+            } else if (name === 'flow') {
+                const s = ctx.createBufferSource(); s.buffer = createNoise(); s.loop = true;
+                const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.Q.value = 8;
+                const lfo = ctx.createOscillator(), lg = ctx.createGain();
+                lfo.frequency.value = 0.12; lg.gain.value = 400;
+                lfo.connect(lg); lg.connect(f.frequency); f.frequency.value = 500;
+                lfo.start(); s.connect(f); f.connect(c.g); s.start(); c.loop = s; c.nodes = [lfo];
+            } else {
+                const s = ctx.createBufferSource(); s.buffer = createNoise(); s.loop = true;
+                const f = ctx.createBiquadFilter();
+                if (name === 'thunder') { f.type = 'lowpass'; f.frequency.value = 350; playThunder(); }
+                if (name === 'wind') { f.type = 'bandpass'; f.frequency.value = 500; }
+                if (name === 'jungle') { f.type = 'highpass'; f.frequency.value = 900; playBirds(); }
+                s.connect(f); f.connect(c.g); s.start(); c.loop = s;
+            }
+        }
+    }
+
+    document.querySelectorAll('.icon-btn').forEach(btn => {
+        btn.addEventListener('click', () => toggle(btn.dataset.sound, btn));
+    });
+
+    document.querySelectorAll('.v-slider').forEach(s => {
+        s.addEventListener('input', (e) => {
+            const id = e.target.id.split('-')[1];
+            channels[id].g.gain.setTargetAtTime(e.target.value, ctx.currentTime, 0.05);
+        });
+    });
+
+    window.onkeydown = (e) => {
+        if (e.code === 'Space') { e.preventDefault(); b.p.hidden ? timerStart() : timerPause(); }
+        if (e.code === 'KeyS' && !b.s.hidden) timerStart();
+        if (e.code === 'KeyR') timerReset();
+    };
+</script>
+
+</body>
+</html>
