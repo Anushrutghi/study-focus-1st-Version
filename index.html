@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>focus enviroment
-
-    </title>
+    <title>Focus Enviroment</title>
     <style>
         :root {
             --bg: #000;
@@ -28,6 +26,27 @@
             overflow: hidden;
             touch-action: manipulation;
         }
+
+        /* Fullscreen Toggle Button */
+        #fsToggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            opacity: 0.4;
+            z-index: 100;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #fsToggle:hover { opacity: 1; border-color: var(--cyan); }
 
         .container { 
             width: 100%; 
@@ -68,7 +87,6 @@
         
         .active-btn { border-color: var(--cyan) !important; color: var(--cyan) !important; box-shadow: 0 0 10px rgba(0, 242, 255, 0.1); }
 
-        /* Responsive Mixer */
         .mixer-panel {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -82,7 +100,6 @@
 
         @media (max-width: 480px) {
             .mixer-panel { grid-template-columns: repeat(3, 1fr); gap: 20px; }
-            #display { margin-bottom: 1.5rem; }
         }
 
         .channel { display: flex; flex-direction: column; align-items: center; gap: 12px; }
@@ -129,8 +146,12 @@
 </head>
 <body>
 
+<button id="fsToggle" title="Toggle Fullscreen">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+</button>
+
 <div class="container">
-    <div class="label">focus enviroment</div>
+    <div class="label">Focus Enviroment</div>
     <div id="display">00:00:00:00</div>
 
     <div class="controls">
@@ -168,7 +189,7 @@
         </div>
     </div>
 
-    <div class="hints">DESKTOP: SPACE/S/R | MOBILE: TAP TO START</div>
+    <div class="hints">SPACE: TOGGLE | S: START | R: RESET | F: FULLSCREEN</div>
 </div>
 
 <script>
@@ -189,7 +210,22 @@
 
     b.s.onclick = timerStart; b.p.onclick = timerPause; b.re.onclick = timerStart; b.rs.onclick = timerReset;
 
-    // --- CROSS-PLATFORM AUDIO ENGINE ---
+    // --- FULLSCREEN LOGIC ---
+    const fsBtn = document.getElementById('fsToggle');
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                alert(`Error attempting to enable full-screen mode: ${err.message}`);
+            });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+    fsBtn.onclick = toggleFullScreen;
+
+    // --- AUDIO ENGINE ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const ctx = new AudioContext();
     const channels = {
@@ -202,7 +238,6 @@
 
     Object.keys(channels).forEach(k => { channels[k].g.connect(ctx.destination); channels[k].g.gain.value = 0.5; });
 
-    // iOS/Android Unlock
     function unlockAudio() { if (ctx.state === 'suspended') ctx.resume(); }
 
     function createNoise() {
@@ -285,6 +320,7 @@
         if (e.code === 'Space') { e.preventDefault(); b.p.hidden ? timerStart() : timerPause(); }
         if (e.code === 'KeyS' && !b.s.hidden) timerStart();
         if (e.code === 'KeyR') timerReset();
+        if (e.code === 'KeyF') toggleFullScreen();
     };
 </script>
 
